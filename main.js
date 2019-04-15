@@ -15,59 +15,7 @@
 				this.x = settings.x;
 				this.y = settings.y;
 			}
-		}
-
-		for ( var i = 0; i < 8; i++ ) {
-			field.push([]);
-			for ( var j = 0; j < 8; j++ )
-				field[i].push(new Figure({ x: j, y: i })); // color = undefined
-		}
-
-		class King extends Figure {
-			turn (x, y) {
-
-			}
-			check (x, y) {
-
-			}
-		}
-		class Queen extends Figure {
-			turn (x, y) {
-
-			}
-			check (x, y) {
-
-			}
-		}
-		class Rook extends Figure {
-			turn (x, y) {
-
-			}
-			check (x, y) {
-
-			}
-		}
-		class Bishop extends Figure {
-			turn (x, y) {
-
-			}
-			check (x, y) {
-
-			}
-		}
-		class Horse extends Figure {
-			turn (x, y) {
-
-			}
-			check (x, y) {
-
-			}
-		}
-		class Pawn extends Figure {
-			constructor (settings) {
-				super(settings);
-				this.first_turn = true;
-			}
+			
 			turn (x, y) {
 				field[y][x] = this;
 				field[this.y][this.x] = new Figure({x: this.x, y: this.y});
@@ -80,6 +28,51 @@
 				$(`#chess>button[onclick="turn(${x}, ${y})"]`).html(
 					`<img src="${field[y][x].src != undefined ? field[y][x].src : ''}" alt="">`
 				)
+			}
+		}
+
+		for ( var i = 0; i < 8; i++ ) {
+			field.push([]);
+			for ( var j = 0; j < 8; j++ )
+				field[i].push(new Figure({ x: j, y: i })); // color = undefined
+		}
+
+		// будем считать, что перед любым ходом быудет выполняться проверка, потому функция turn упрощается
+		// и становится универсальной
+
+		class King extends Figure {
+			check (x, y) {
+
+			}
+		}
+		class Queen extends Figure {
+			check (x, y) {
+
+			}
+		}
+		class Rook extends Figure {
+			check (x, y) {
+
+			}
+		}
+		class Bishop extends Figure {
+			check (x, y) {
+				
+			}
+		}
+		class Horse extends Figure {
+			check (x, y) {
+
+			}
+		}
+		class Pawn extends Figure {
+			constructor (settings) {
+				super(settings);
+				this.first_turn = true;
+			}
+			turn(x, y) {
+				super.turn(x, y);
+				if (this.first_turn) this.first_turn = false;
 			}
 			check (x, y) {
 				if (this.x == x) {

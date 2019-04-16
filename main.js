@@ -52,7 +52,17 @@
 		}
 		class Rook extends Figure {
 			check (x, y) {
-
+				if (this.x == x) {
+					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+						if (field[i][x].color != undefined) return false;
+					return (field[i][x].color == undefined) || (field[i][x].color != this.color)
+				}
+				else if (this.y == y){
+					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+						if (field[y][i].color != undefined) return false;
+					return (field[y][i].color == undefined) || (field[x][i].color != this.color)
+				}
+				else return false;
 			}
 		}
 		class Bishop extends Figure {

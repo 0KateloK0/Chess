@@ -41,16 +41,55 @@
 		// и становится универсальной
 
 		class King extends Figure {
-			check (x, y) {
-
+			constructor (settings) {
+				super(settings);
+				this.first_turn = true;
+			}
+			turn (x, y) { // своя ф-ция хода, ибо ракировка
+				super.turn(x, y);
+				if (this.first_turn) this.first_turn = false;
+			}
+			check (x, y) { // O(n^3)
+				if ((Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1)) {
+					
+				}
+				else return false;
 			}
 		}
 		class Queen extends Figure {
 			check (x, y) {
-
+				if (this.x == x) {
+					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+						if (field[i][x].color != undefined) return false;
+					return (field[i][x].color == undefined) || (field[i][x].color != this.color)
+				}
+				else if (this.y == y) {
+					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+						if (field[y][i].color != undefined) return false;
+					return (field[y][i].color == undefined) || (field[x][i].color != this.color)
+				}
+				else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+					var i = this.y - Math.sign(this.y-y);
+					var j = this.x - Math.sign(this.x-x);
+					while ((i != y) && (j != x)) {
+						if (field[i][j].color != undefined) return false;
+						i -= Math.sign(this.y - y);
+						j -= Math.sign(this.x - x);
+					}
+					return (field[y][x].color == undefined) || (field[y][x].color != this.color);
+				}
+				else return false;
 			}
 		}
 		class Rook extends Figure {
+			constructor (settings) {
+				super(settings);
+				this.first_turn = true;
+			}
+			turn (x, y) {
+				super.turn(x, y);
+				if (this.first_turn) this.first_turn = true;
+			}
 			check (x, y) {
 				if (this.x == x) {
 					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
@@ -67,12 +106,25 @@
 		}
 		class Bishop extends Figure {
 			check (x, y) {
-				
+				if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+					var i = this.y - Math.sign(this.y-y);
+					var j = this.x - Math.sign(this.x-x);
+					while ((i != y) && (j != x)) {
+						if (field[i][j].color != undefined) return false;
+						i -= Math.sign(this.y - y);
+						j -= Math.sign(this.x - x);
+					}
+					return (field[y][x].color == undefined) || (field[y][x].color != this.color);
+				}
+				else return false;
 			}
 		}
 		class Horse extends Figure {
 			check (x, y) {
-
+				if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
+					((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
+					return (field[y][x].color == undefined) || (field[y][x].color != this.color);
+				else return false;
 			}
 		}
 		class Pawn extends Figure {

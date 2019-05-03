@@ -89,15 +89,17 @@
 				if ((Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1)) {
 					for (var i = 0; i < 8; i++) 
 						for (var j = 0; j < 8; j++) 
-							if ((i != this.y) && (j != this.x))
-							if ((field[i][j].color != this.color) && field[i][j].table[y][x])
-								return false;
+							if (!((i == this.y) && (j == this.x)))
+								if ((field[i][j].color != this.color) && field[i][j].table[y][x])
+									return false;
 					return (field[y][x].color != this.color) || (field[y][x].color == undefined);
 				}
 				else return false;
 			}
 			defends (x, y) {
-				return (Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1);
+				if (!((this.x == x) && (this.y == y)))
+					return (Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1);
+				else return false;
 			}
 		}
 		class Queen extends Figure {
@@ -125,26 +127,28 @@
 				else return false;
 			}
 			defends (x, y) {
-				if (this.x == x) {
-					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-						if (field[i][x].color != undefined) return false;
-					return true;
-				}
-				else if (this.y == y) {
-					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-						if (field[y][i].color != undefined) return false;
-					return true;
-				}
-				else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
-					var i = this.y - Math.sign(this.y-y);
-					var j = this.x - Math.sign(this.x-x);
-					while ((i != y) && (j != x)) {
-						if (field[i][j].color != undefined) return false;
-						i -= Math.sign(this.y - y);
-						j -= Math.sign(this.x - x);
+				if (!((this.x == x) && (this.y == y)))
+					if (this.x == x) {
+						for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+							if (field[i][x].color != undefined) return false;
+						return true;
 					}
-					return true;
-				}
+					else if (this.y == y) {
+						for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+							if (field[y][i].color != undefined) return false;
+						return true;
+					}
+					else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+						var i = this.y - Math.sign(this.y-y);
+						var j = this.x - Math.sign(this.x-x);
+						while ((i != y) && (j != x)) {
+							if (field[i][j].color != undefined) return false;
+							i -= Math.sign(this.y - y);
+							j -= Math.sign(this.x - x);
+						}
+						return true;
+					}
+					else return false;
 				else return false;
 			}
 		}
@@ -171,16 +175,18 @@
 				else return false;
 			}
 			defends (x, y) {
-				if (this.x == x) {
-					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-						if (field[i][x].color != undefined) return false;
-					return true;
-				}
-				else if (this.y == y){
-					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-						if (field[y][i].color != undefined) return false;
-					return true;
-				}
+				if (!((this.x == x) && (this.y == y)))
+					if (this.x == x) {
+						for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+							if (field[i][x].color != undefined) return false;
+						return true;
+					}
+					else if (this.y == y){
+						for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+							if (field[y][i].color != undefined) return false;
+						return true;
+					}
+					else return false;
 				else return false;
 			}
 		}
@@ -199,16 +205,18 @@
 				else return false;
 			}
 			defends (x, y) {
-				if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
-					var i = this.y - Math.sign(this.y-y);
-					var j = this.x - Math.sign(this.x-x);
-					while ((i != y) && (j != x)) {
-						if (field[i][j].color != undefined) return false;
-						i -= Math.sign(this.y - y);
-						j -= Math.sign(this.x - x);
+				if (!((this.x == x) && (this.y == y)))
+					if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+						var i = this.y - Math.sign(this.y-y);
+						var j = this.x - Math.sign(this.x-x);
+						while ((i != y) && (j != x)) {
+							if (field[i][j].color != undefined) return false;
+							i -= Math.sign(this.y - y);
+							j -= Math.sign(this.x - x);
+						}
+						return true;
 					}
-					return true;
-				}
+					else return false;
 				else return false;
 			}
 		}
@@ -220,9 +228,11 @@
 				else return false;
 			}
 			defends (x, y) {
-				if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
-					((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
-					return true;
+				if (!((this.x == x) && (this.y == y)))
+					if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
+						((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
+						return true;
+					else return false;
 				else return false;
 			}
 		}
@@ -249,10 +259,12 @@
 					else return false;
 			}
 			defends (x, y) {
-				if (Math.abs(this.x - x) == 1)
-					if (this.color && this.y - y == 1 || !this.color && y - this.y == 1)
-						return true;
-					else return false;
+				if (!((this.x == x) && (this.y == y)))
+					if (Math.abs(this.x - x) == 1)
+						if (this.color && this.y - y == 1 || !this.color && y - this.y == 1)
+							return true;
+						else return false;
+				else return false;
 			}
 		}
 
@@ -294,13 +306,71 @@
 					<img src="${field[i][j].src != undefined ? field[i][j].src : ''}" alt="">
 				</button>`);
 
-		// function turn
-		
 		var order_now = true; // true == ход белых
-		var figure_chosen = undefined; // undefined - фигура не выбрана, 0 - пустая клетка
+		var figure_chosen = undefined; // undefined - фигура не выбрана
+		var checked = false;
+
+		function find_king () {
+			for (var i = 0; i < 8; i++)
+				for (var j = 0; j < 8; j++)
+					if ((field[i][j] instanceof King) && (field[i][j].color != order_now)) 
+						return {x: j, y: i};
+		}
+
+		function check() {
+			var kp = find_king();
+			return !field.every( (a) => a.every( (b) => b.table[kp.y][kp.x] ) );
+		}
+
+		function checkmate() {
+			var kp = find_king();
+			if (check()) 
+				if (field[kp.y][kp.x].table_turns.every((a) => a.every((b) => !b))) {
+					var arr = [];
+					for (var i = 0; i < 8; i++) 
+						for (var j = 0; j < 8; j++) 
+							if (field[i][j].defends(kp.y, kp.x))
+								arr.push({x: j, y: i});
+					if (arr.length == 1)
+						if (field[arr[0].y][arr[0].x] instanceof Horse)
+							return true;
+						else if (field[arr[0].y][arr[0].x] instanceof Rook)
+							return true;
+						else {
+							if (kp.x == arr[0].x) {
+								if (!((this.x == x) && (this.y == y)))
+									if (this.x == x) {
+										for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+											if (field[i][x].color != undefined) return false;
+										return true;
+									}
+									else if (this.y == y) {
+										for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+											if (field[y][i].color != undefined) return false;
+										return true;
+									}
+									else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+										var i = this.y - Math.sign(this.y-y);
+										var j = this.x - Math.sign(this.x-x);
+										while ((i != y) && (j != x)) {
+											if (field[i][j].color != undefined) return false;
+											i -= Math.sign(this.y - y);
+											j -= Math.sign(this.x - x);
+										}
+										return true;
+									}
+									else return false;
+								else return false;
+							}
+						}
+					else if (arr.length > 1) return true;
+				}
+				else return false;
+			else return false;
+		}
+
 		window.turn = function (x, y) {
 			if (!figure_chosen) { // если undefined
-				if (typeof field[y][x] != "object") return;
 				if (field[y][x].color == order_now){
 					figure_chosen = field[y][x];
 					figure_chosen.show();
@@ -308,18 +378,19 @@
 				return;
 			}
 			else {
-				if (typeof field[y][x] == "object") {
-					figure_chosen.unshow();
-					if (field[y][x].color != order_now || typeof field[y][x].color == "undefined") {
-						if (figure_chosen.check(x, y)) {
-							figure_chosen.turn(x, y);
-							order_now = !order_now;
-							figure_chosen = undefined;
-						}
-					} else {
-						figure_chosen = field[y][x];
-						figure_chosen.show();
+				figure_chosen.unshow();
+				if (field[y][x].color != order_now || typeof field[y][x].color == "undefined") {
+					if (figure_chosen.check(x, y)) {
+						figure_chosen.turn(x, y);
+						order_now = !order_now;
+						figure_chosen = undefined;
+						if (checkmate())
+							alert(`${order_now ? 'Белые' : 'Черные'} победили!`);
+						else if (check()) {  }
 					}
+				} else {
+					figure_chosen = field[y][x];
+					figure_chosen.show();
 				}
 			}
 		}

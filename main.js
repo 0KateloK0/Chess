@@ -29,6 +29,42 @@
 					`<img src="${field[y][x].src != undefined ? field[y][x].src : ''}" alt="">`
 				)
 			}
+
+			defends () {
+				return false;
+			}
+
+			get table (){
+				var table = [];
+				for (var i = 0; i < 8; i++) {
+					table.push([]);
+					for (var j = 0; j < 8; j++)
+						table[i].push( this.defends(j, i) );
+				}
+				return table;
+			}
+
+			get table_turns () {
+				var table_turns = [];
+				for (var i = 0; i < 8; i++) {
+					table_turns.push([]);
+					for (var j = 0; j < 8; j++)
+						table_turns[i].push( this.check(j, i) );
+				}
+				return table_turns;
+			}
+
+			show() {
+				var t = this.table_turns;
+				for (var i = 0; i < 8; i++)
+					for (var j = 0; j < 8; j++)
+						if (t[i][j])
+							$(`#chess>button[onclick="turn(${j}, ${i})"]`).css('background', 'green');
+			}
+
+			unshow() {
+				$('#chess>button').attr('style', '');
+			}
 		}
 
 		for ( var i = 0; i < 8; i++ ) {
@@ -51,9 +87,17 @@
 			}
 			check (x, y) { // O(n^3)
 				if ((Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1)) {
-					
+					for (var i = 0; i < 8; i++) 
+						for (var j = 0; j < 8; j++) 
+							if ((i != this.y) && (j != this.x))
+							if ((field[i][j].color != this.color) && field[i][j].table[y][x])
+								return false;
+					return (field[y][x].color != this.color) || (field[y][x].color == undefined);
 				}
 				else return false;
+			}
+			defends (x, y) {
+				return (Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1);
 			}
 		}
 		class Queen extends Figure {
@@ -66,7 +110,7 @@
 				else if (this.y == y) {
 					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
 						if (field[y][i].color != undefined) return false;
-					return (field[y][i].color == undefined) || (field[x][i].color != this.color)
+					return (field[y][i].color == undefined) || (field[y][i].color != this.color)
 				}
 				else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
 					var i = this.y - Math.sign(this.y-y);
@@ -77,6 +121,29 @@
 						j -= Math.sign(this.x - x);
 					}
 					return (field[y][x].color == undefined) || (field[y][x].color != this.color);
+				}
+				else return false;
+			}
+			defends (x, y) {
+				if (this.x == x) {
+					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+						if (field[i][x].color != undefined) return false;
+					return true;
+				}
+				else if (this.y == y) {
+					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+						if (field[y][i].color != undefined) return false;
+					return true;
+				}
+				else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+					var i = this.y - Math.sign(this.y-y);
+					var j = this.x - Math.sign(this.x-x);
+					while ((i != y) && (j != x)) {
+						if (field[i][j].color != undefined) return false;
+						i -= Math.sign(this.y - y);
+						j -= Math.sign(this.x - x);
+					}
+					return true;
 				}
 				else return false;
 			}
@@ -99,7 +166,20 @@
 				else if (this.y == y){
 					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
 						if (field[y][i].color != undefined) return false;
-					return (field[y][i].color == undefined) || (field[x][i].color != this.color)
+					return (field[y][i].color == undefined) || (field[y][i].color != this.color)
+				}
+				else return false;
+			}
+			defends (x, y) {
+				if (this.x == x) {
+					for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
+						if (field[i][x].color != undefined) return false;
+					return true;
+				}
+				else if (this.y == y){
+					for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
+						if (field[y][i].color != undefined) return false;
+					return true;
 				}
 				else return false;
 			}
@@ -118,12 +198,31 @@
 				}
 				else return false;
 			}
+			defends (x, y) {
+				if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
+					var i = this.y - Math.sign(this.y-y);
+					var j = this.x - Math.sign(this.x-x);
+					while ((i != y) && (j != x)) {
+						if (field[i][j].color != undefined) return false;
+						i -= Math.sign(this.y - y);
+						j -= Math.sign(this.x - x);
+					}
+					return true;
+				}
+				else return false;
+			}
 		}
 		class Horse extends Figure {
 			check (x, y) {
 				if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
 					((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
 					return (field[y][x].color == undefined) || (field[y][x].color != this.color);
+				else return false;
+			}
+			defends (x, y) {
+				if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
+					((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
+					return true;
 				else return false;
 			}
 		}
@@ -143,9 +242,16 @@
 					if (this.first_turn) return this.color ? (this.y - y == 2 || this.y - y == 1) 
 														   : (y - this.y == 2 || y - this.y == 1);
 					else return this.color ? (this.y - y == 1) : (y - this.y == 1);
-				} else if (Math.abs(this.x - x) == 1)
+				}
+				else if (Math.abs(this.x - x) == 1)
 					if (this.color && this.y - y == 1 || !this.color && y - this.y == 1)
 						return (field[y][x].color != undefined) && (this.color != field[y][x].color);
+					else return false;
+			}
+			defends (x, y) {
+				if (Math.abs(this.x - x) == 1)
+					if (this.color && this.y - y == 1 || !this.color && y - this.y == 1)
+						return true;
 					else return false;
 			}
 		}
@@ -195,12 +301,15 @@
 		window.turn = function (x, y) {
 			if (!figure_chosen) { // если undefined
 				if (typeof field[y][x] != "object") return;
-				if (field[y][x].color == order_now)
+				if (field[y][x].color == order_now){
 					figure_chosen = field[y][x];
+					figure_chosen.show();
+				}
 				return;
 			}
 			else {
 				if (typeof field[y][x] == "object") {
+					figure_chosen.unshow();
 					if (field[y][x].color != order_now || typeof field[y][x].color == "undefined") {
 						if (figure_chosen.check(x, y)) {
 							figure_chosen.turn(x, y);
@@ -209,6 +318,7 @@
 						}
 					} else {
 						figure_chosen = field[y][x];
+						figure_chosen.show();
 					}
 				}
 			}

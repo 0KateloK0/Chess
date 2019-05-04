@@ -30,9 +30,8 @@
 				)
 			}
 
-			defends () {
-				return false;
-			}
+			defends () { return false; }
+			check () { return false; }
 
 			get table (){
 				var table = [];
@@ -130,19 +129,19 @@
 				if (!((this.x == x) && (this.y == y)))
 					if (this.x == x) {
 						for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-							if (field[i][x].color != undefined) return false;
+							if (!(field[i][x] instanceof King) && (field[i][x].color != undefined)) return false;
 						return true;
 					}
 					else if (this.y == y) {
 						for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-							if (field[y][i].color != undefined) return false;
+							if (!(field[i][x] instanceof King) && (field[y][i].color != undefined)) return false;
 						return true;
 					}
 					else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
 						var i = this.y - Math.sign(this.y-y);
 						var j = this.x - Math.sign(this.x-x);
 						while ((i != y) && (j != x)) {
-							if (field[i][j].color != undefined) return false;
+							if (!(field[i][j] instanceof King) && (field[i][j].color != undefined)) return false;
 							i -= Math.sign(this.y - y);
 							j -= Math.sign(this.x - x);
 						}
@@ -178,12 +177,12 @@
 				if (!((this.x == x) && (this.y == y)))
 					if (this.x == x) {
 						for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-							if (field[i][x].color != undefined) return false;
+							if (!(field[i][x] instanceof King) && (field[i][x].color != undefined)) return false;
 						return true;
 					}
 					else if (this.y == y){
 						for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-							if (field[y][i].color != undefined) return false;
+							if (!(field[y][i] instanceof King) && (field[y][i].color != undefined)) return false;
 						return true;
 					}
 					else return false;
@@ -210,7 +209,7 @@
 						var i = this.y - Math.sign(this.y-y);
 						var j = this.x - Math.sign(this.x-x);
 						while ((i != y) && (j != x)) {
-							if (field[i][j].color != undefined) return false;
+							if (!(field[i][x] instanceof King) && (field[i][j].color != undefined)) return false;
 							i -= Math.sign(this.y - y);
 							j -= Math.sign(this.x - x);
 						}
@@ -229,10 +228,8 @@
 			}
 			defends (x, y) {
 				if (!((this.x == x) && (this.y == y)))
-					if (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
-						((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2))) 
-						return true;
-					else return false;
+					return (((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
+						((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2)));
 				else return false;
 			}
 		}
@@ -319,7 +316,7 @@
 
 		function check() {
 			var kp = find_king();
-			return !field.every( (a) => a.every( (b) => b.table[kp.y][kp.x] ) );
+			return field.some( (a) => a.some( (b) => b.check(kp.x, kp.y) ) );
 		}
 
 		function checkmate() {
@@ -329,41 +326,45 @@
 					var arr = [];
 					for (var i = 0; i < 8; i++) 
 						for (var j = 0; j < 8; j++) 
-							if (field[i][j].defends(kp.y, kp.x))
+							if (field[i][j].check(kp.x, kp.y))
 								arr.push({x: j, y: i});
 					if (arr.length == 1)
-						if (field[arr[0].y][arr[0].x] instanceof Horse)
-							return true;
-						else if (field[arr[0].y][arr[0].x] instanceof Rook)
-							return true;
+						if (field[arr[0].y][arr[0].x] instanceof Horse) return true;
+						else if (field[arr[0].y][arr[0].x] instanceof Pawn) return true;
+						else if (field.some( (a) => a.some( (b) => b.check(arr[0].x, arr[0].y) ) ) )
+							return false;
 						else {
 							if (kp.x == arr[0].x) {
-								if (!((this.x == x) && (this.y == y)))
-									if (this.x == x) {
-										for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-											if (field[i][x].color != undefined) return false;
-										return true;
-									}
-									else if (this.y == y) {
-										for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-											if (field[y][i].color != undefined) return false;
-										return true;
-									}
-									else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
-										var i = this.y - Math.sign(this.y-y);
-										var j = this.x - Math.sign(this.x-x);
-										while ((i != y) && (j != x)) {
-											if (field[i][j].color != undefined) return false;
-											i -= Math.sign(this.y - y);
-											j -= Math.sign(this.x - x);
-										}
-										return true;
-									}
-									else return false;
-								else return false;
+								for (var i = arr[0].y - Math.sign(arr[0].y-kp.y); i != kp.y; i -= Math.sign(arr[0].y-kp.y))
+									for (let j = 0; j < 8; j++)
+										for (let m = 0; m < 8; m++)
+											if ((field[j][m].color != order_now) && field[j][m].check(arr[0].x, i))
+												return false;
+								return true;
+							}
+							else if (arr[0].y == kp.y) {
+								for (var i = arr[0].x - Math.sign(arr[0].x-kp.x); i != kp.x; i -= Math.sign(arr[0].x-kp.x))
+									for (let j = 0; j < 8; j++) 
+										for (let m = 0; m < 8; m++)
+											if ((field[j][m].color != order_now) && field[j][m].check(i, arr[0].y))
+												return false;
+								return true;
+							}
+							else if (Math.abs(arr[0].y - kp.y) == Math.abs(arr[0].x - kp.x)) {
+								var i = arr[0].y - Math.sign(arr[0].y-kp.y);
+								var j = arr[0].x - Math.sign(arr[0].x-kp.x);
+								while ((i != kp.y) && (j != kp.x)) {
+									for (let m = 0; m < 8; m++)
+										for (let l = 0; l < 8; l++)
+											if ((field[m][l].color != order_now) && field[m][l].check(j, i))
+												return false;
+									i -= Math.sign(arr[0].y - kp.y);
+									j -= Math.sign(arr[0].x - kp.x);
+								}
+								return true;
 							}
 						}
-					else if (arr.length > 1) return true;
+					else return true;
 				}
 				else return false;
 			else return false;
@@ -382,11 +383,11 @@
 				if (field[y][x].color != order_now || typeof field[y][x].color == "undefined") {
 					if (figure_chosen.check(x, y)) {
 						figure_chosen.turn(x, y);
-						order_now = !order_now;
-						figure_chosen = undefined;
 						if (checkmate())
 							alert(`${order_now ? 'Белые' : 'Черные'} победили!`);
 						else if (check()) {  }
+						order_now = !order_now;
+						figure_chosen = undefined;
 					}
 				} else {
 					figure_chosen = field[y][x];

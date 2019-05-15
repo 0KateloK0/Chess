@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		* {
+			padding: 0;
+			margin: 0;
+		}
+		body {
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: flex;
+			justify-content: space-around;
+		}
+		#chess {
+			display: grid;
+			grid-template-rows: repeat(8, 60px);
+			grid-template-columns: repeat(8, 60px);
+			border: 1px solid black;
+		}
+		#chess>button {
+			display: block;
+			background: white;
+			border: none;
+			cursor: pointer;
+			outline: none;
+		}
+		#chess>button[data-color="black"] {
+			background: grey;
+		}
+		#chess>button>img {
+			width: 60px;
+		}
+	</style>
+</head>
+<body onload="init()">
+	<div id="chess"></div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+</body>
+</html>

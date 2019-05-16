@@ -295,6 +295,8 @@ function init() {
 			</button>`);
 		}
 	}
+
+	turns_arr = [];
 }
 
 var figure_chosen = undefined;
@@ -345,6 +347,15 @@ function checkmate() {
 	} else return false;
 }
 
+class Turn {
+	// ????? переделать функцию turn?
+	constructor (f, prev, now) {
+		this.f = f;
+		this.prev = prev;
+		this.now = now;
+	}
+}
+
 window.turn = function(x, y) {
 	if (!figure_chosen) { // если undefined
 		if (field[y][x].color == order_now) {
@@ -353,14 +364,17 @@ window.turn = function(x, y) {
 		}
 	}
 	else {
-		if ((field[y][x].color == undefined) || (field[y][x].color != order_now))
+		if ((field[y][x].color == undefined) || (field[y][x].color != order_now)) {
+			var [tx, ty] = [figure_chosen.x, figure_chosen.y];
 			if (!figure_chosen.turn(x, y))
 				alert('Неправильный ход');
 			else {
+				turns_arr.push(new Turn(figure_chosen.constructor, {x: tx, y: ty}, {x: x, y: y}));
 				figure_chosen.unshow();
 				order_now = !order_now;
 				figure_chosen = undefined;
 			}
+		}
 		else {
 			figure_chosen.unshow();
 			figure_chosen = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);

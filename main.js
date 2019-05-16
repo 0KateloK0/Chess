@@ -35,6 +35,8 @@ class Figure {
 				var copy = new this.constructor(this.x, this.y, this.color);
 				field[this.y][this.x] = new Figure(this.x, this.y);
 				var res = check();
+				if (res) 
+					res = !this.check1(x, y);
 				field[copy.y][copy.x] = new copy.constructor(copy.x, copy.y, copy.color);
 				return !res;
 			} else return false;
@@ -48,7 +50,8 @@ class Figure {
 	 */
 	check1 (x, y) {
 		if ( this.defends(x, y) ) {
-			if (field[y][x].color != this.color) {
+			if (field[y][x] instanceof King) return true;
+			else if (field[y][x].color != this.color) {
 				var copy = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);
 				var [tx, ty] = [this.x, this.y];
 				this.turn0(x, y);
@@ -75,31 +78,32 @@ class Figure {
 	 * @return {boolean} return turn possibility
 	 */
 	turn (x, y) {
-		if (check()) {
-			if ( this.check1(x, y) ){
-				this.turn0(x, y);
-				this.firstTurn = false;
-				return true;
-			} else return false;
-		}
-		else {
-			if ( this.check0(x, y) ) {
-				this.turn0(x, y);
-				this.firstTurn = false;
-				return true;
-			} else return false;
-		} 
+		if ((check() && this.check1(x, y)) || (!check() && this.check0(x, y))) {
+			this.turn0(x, y);
+			this.firstTurn = false;
+			return true;
+		} else return false;
 	}
 
 	show () {
 		for (var i = 0; i < 8; i++) 
 			for (var j = 0; j < 8; j++) 
-				if ((check() && this.check1(j, i)) || this.check0(j, i))
+				if ((check() && this.check1(j, i)) || (!check() && this.check0(j, i)))
 					$(`#chess>button[onclick="turn(${j}, ${i})"]`).css('background', 'green');
 	}
 
 	unshow () {
 		$('#chess>button').attr('style', '');
+	}
+
+	get table() {
+		var table = [];
+		for (var i = 0; i < 8; i++) {
+			table.push([]);
+			for (var j = 0; j < 8; j++)
+				table[i].push( this.check0(j, i) );
+		}
+		return table;
 	}
 }
 
@@ -108,6 +112,15 @@ class King extends Figure {
 		super(x, y, color, color ? 'img/wK.png' : 'img/bK.png');
 	}
 	defends (x, y) {
+		if ((Math.abs(this.x - x) == 2) && (this.y == y)) {
+			if (this.firstTurn && field[y][this.x-x < 0 ? 0 : 7].firstTurn) {
+				for (var c = this.x - Math.sign(this.x-x); c != (this.x-x < 0 ? 7 : 0); c -= Math.sign(this.x - x))
+					for (var i = 0; i < 8; i++) 
+						for (var j = 0; j < 8; j++)
+							if ((field[i][j].color != this.color) && field[i][j].check0(c, y)) return false;
+				return true;
+			}
+		}
 		return ((Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1));
 	}
 	check0 (x, y) {
@@ -125,7 +138,16 @@ class King extends Figure {
 			return false;
 	}
 	check1 (x, y) {
-		return this.check0(x, y);
+		if (Math.abs(this.x - x) == 2) return false;
+		else return this.check0(x, y);
+	}
+	turn (x, y) {
+		var tx = this.x;
+		if (super.turn(x, y)) {
+			if (Math.abs(tx - x) == 2)
+				field[y][tx - x > 0 ? 0 : 7].turn0(this.x + Math.sign(tx-x), y);
+			return true;
+		} else return false;
 	}
 }
 
@@ -276,6 +298,52 @@ function init() {
 }
 
 var figure_chosen = undefined;
+
+function checkmate() {
+	var kp = find_king();
+	if (check()) {
+		if ( field[kp.y][kp.x].table.every((a)=>a.every((b)=>!b)) ) {
+			var arr = [];
+			field.map( (a, i) => a.map( (b, j) => {if (b.check0(kp.x, kp.y)) arr.push({x: j, y: i})} ) );
+			if (arr.length == 2) return true;
+			else {
+				if (field[arr[0].y][arr[0].x] instanceof Horse) return true;
+				else if (field[arr[0].y][arr[0].x] instanceof Pawn)
+					if (arr[0].x != kp.x) return true;
+					else return false;
+				else if (kp.x == arr[0].x) {
+					for (var i = arr[0].y - Math.sign(arr[0].y-kp.y); i != kp.y; i -= Math.sign(arr[0].y-kp.y))
+						for (let j = 0; j < 8; j++)
+							for (let m = 0; m < 8; m++)
+								if ((field[j][m].color != order_now) && field[j][m].check0(arr[0].x, i))
+									return false;
+					return true;
+				}
+				else if (arr[0].y == kp.y) {
+					for (var i = arr[0].x - Math.sign(arr[0].x-kp.x); i != kp.x; i -= Math.sign(arr[0].x-kp.x))
+						for (let j = 0; j < 8; j++) 
+							for (let m = 0; m < 8; m++)
+								if ((field[j][m].color != order_now) && field[j][m].check0(i, arr[0].y))
+									return false;
+					return true;
+				}
+				else if (Math.abs(arr[0].y - kp.y) == Math.abs(arr[0].x - kp.x)) {
+					var i = arr[0].y - Math.sign(arr[0].y-kp.y);
+					var j = arr[0].x - Math.sign(arr[0].x-kp.x);
+					while ((i != kp.y) && (j != kp.x)) {
+						for (let m = 0; m < 8; m++)
+							for (let l = 0; l < 8; l++)
+								if ((field[m][l].color != order_now) && field[m][l].check0(j, i))
+									return false;
+						i -= Math.sign(arr[0].y - kp.y);
+						j -= Math.sign(arr[0].x - kp.x);
+					}
+					return true;
+				}
+			}
+		} else return false;
+	} else return false;
+}
 
 window.turn = function(x, y) {
 	if (!figure_chosen) { // если undefined

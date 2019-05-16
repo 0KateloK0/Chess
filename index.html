@@ -7,6 +7,7 @@
 		* {
 			padding: 0;
 			margin: 0;
+			box-sizing: border-box;
 		}
 		body {
 			display: -webkit-flex;
@@ -21,6 +22,7 @@
 			grid-template-rows: repeat(8, 50px);
 			grid-template-columns: repeat(8, 50px);
 			border: 1px solid black;
+			position: relative;
 		}
 		#chess>button {
 			display: block;
@@ -35,10 +37,67 @@
 		#chess>button>img {
 			width: 50px;
 		}
+		#chess_overlay {
+			display: none;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background: #00000050;
+		}
+		#inner-chess_overlay {
+			width: 75%;
+			height: auto;
+			display: grid;
+			grid-template-columns: 1fr;
+			grid-template-rows: repeat(4, 1fr);
+			transform: translate(-50%, -50%);
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			background: white;
+		}
+		.chess_menu {
+			border: none;
+			background: none;
+			outline: none;
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: flex;
+			justify-content: space-between;
+			-ms-align-items: center;
+			align-items: center;
+			padding: 0 10px;
+			font-weight: bold;
+			font-size: 30px;
+			font-family: 'Sans-Serif';
+			border-bottom: 1px solid silver;
+		}
+		.chess_menu:hover {
+			background: #D0D0D0;
+			cursor: pointer;
+		}
+		.chess_menu:active {
+			background: grey;
+		}
+		.chess_menu>img {
+		}
 	</style>
 </head>
 <body onload="init()">
-	<div id="chess"></div>
+	<div id="chess">
+		<div id="chess_overlay">
+			<div id="inner-chess_overlay">
+				<button class="chess_menu"><img alt="" data-f="Q"> Ферзь</button>
+				<button class="chess_menu"><img alt="" data-f="R"> Ладья</button>
+				<button class="chess_menu"><img alt="" data-f="B"> Слон</button>
+				<button class="chess_menu"><img alt="" data-f="N"> Конь</button>
+			</div>
+		</div>
+	</div>
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 </body>

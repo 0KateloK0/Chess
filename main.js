@@ -13,8 +13,8 @@ function check() {
 }
 
 class Figure {
-	constructor (x, y, color, src='') {
-		[this.x, this.y, this.color, this.src, this.firstTurn] = [x, y, color, src, true];
+	constructor (x, y, color, firstTurn=true, src='') {
+		[this.x, this.y, this.color, this.firstTurn, this.src] = [x, y, color, firstTurn, src];
 		$(`#chess>button[onclick="turn(${x}, ${y})"]>img`).attr('src', this.src);
 	}
 
@@ -32,12 +32,12 @@ class Figure {
 	check0 (x, y) {
 		if ( this.defends(x, y) ) {
 			if (field[y][x].color != this.color) {
-				var copy = new this.constructor(this.x, this.y, this.color);
+				var copy = new this.constructor(this.x, this.y, this.color, this.firstTurn);
 				field[this.y][this.x] = new Figure(this.x, this.y);
 				var res = check();
 				if (res) 
 					res = !this.check1(x, y);
-				field[copy.y][copy.x] = new copy.constructor(copy.x, copy.y, copy.color);
+				field[copy.y][copy.x] = new copy.constructor(copy.x, copy.y, copy.color, copy.firstTurn);
 				return !res;
 			} else return false;
 		} else return false;
@@ -52,12 +52,12 @@ class Figure {
 		if ( this.defends(x, y) ) {
 			if (field[y][x] instanceof King) return true;
 			else if (field[y][x].color != this.color) {
-				var copy = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);
+				var copy = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 				var [tx, ty] = [this.x, this.y];
 				this.turn0(x, y);
 				var res = check();
 				this.turn0(tx, ty);
-				field[y][x] = new copy.constructor(copy.x, copy.y, copy.color);
+				field[y][x] = new copy.constructor(copy.x, copy.y, copy.color, field[y][x].firstTurn);
 				return !res;
 			} else return false;
 		} else return false;
@@ -68,7 +68,7 @@ class Figure {
 	 */
 	turn0 (x, y) {
 		var [tx, ty] = [this.x, this.y];
-		field[y][x] = new this.constructor(x, y, this.color);
+		field[y][x] = new this.constructor(x, y, this.color, this.firstTurn);
 		[this.x, this.y] = [x, y];
 		field[ty][tx] = new Figure(tx, ty);
 	}
@@ -79,8 +79,8 @@ class Figure {
 	 */
 	turn (x, y) {
 		if ((check() && this.check1(x, y)) || (!check() && this.check0(x, y))) {
-			this.turn0(x, y);
 			this.firstTurn = false;
+			this.turn0(x, y);
 			return true;
 		} else return false;
 	}
@@ -108,9 +108,10 @@ class Figure {
 }
 
 class King extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wK.png' : 'img/bK.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wK.png' : 'img/bK.png');
 	}
+
 	defends (x, y) {
 		if ((Math.abs(this.x - x) == 2) && (this.y == y)) {
 			if (this.firstTurn && field[y][this.x-x < 0 ? 0 : 7].firstTurn) {
@@ -123,24 +124,27 @@ class King extends Figure {
 		}
 		return ((Math.abs(this.x - x) <= 1) && (Math.abs(this.y - y) <= 1));
 	}
+
 	check0 (x, y) {
 		if ( this.defends(x, y) ) 
 			if ( field[y][x].color != this.color ) {
-				var copy = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);
+				var copy = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 				var [tx, ty] = [this.x, this.y];
 				this.turn0(x, y);
 				var res = check();
 				this.turn0(tx, ty);
-				field[copy.y][copy.x] = new copy.constructor(copy.x, copy.y, copy.color);
+				field[copy.y][copy.x] = new copy.constructor(copy.x, copy.y, copy.color, copy.firstTurn);
 				return !res;
 			}
 		else
 			return false;
 	}
+
 	check1 (x, y) {
 		if (Math.abs(this.x - x) == 2) return false;
 		else return this.check0(x, y);
 	}
+
 	turn (x, y) {
 		var tx = this.x;
 		if (super.turn(x, y)) {
@@ -152,9 +156,10 @@ class King extends Figure {
 }
 
 class Queen extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wQ.png' : 'img/bQ.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wQ.png' : 'img/bQ.png');
 	}
+
 	defends (x, y) {
 		if (!((this.x == x) && (this.y == y)))
 			if (this.x == x) {
@@ -183,9 +188,10 @@ class Queen extends Figure {
 }
 
 class Rook extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wR.png' : 'img/bR.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wR.png' : 'img/bR.png');
 	}
+
 	defends (x, y) {
 		if (this.x == x) {
 			for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
@@ -202,9 +208,10 @@ class Rook extends Figure {
 }
 
 class Bishop extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wB.png' : 'img/bB.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wB.png' : 'img/bB.png');
 	}
+
 	defends (x, y) {
 		if (!((this.x == x) && (this.y == y)))
 			if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
@@ -223,9 +230,10 @@ class Bishop extends Figure {
 }
 
 class Horse extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wN.png' : 'img/bN.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wN.png' : 'img/bN.png');
 	}
+
 	defends (x, y) {
 		return ((Math.abs(this.x - x) == 2) && (Math.abs(this.y - y) == 1)) ||
 				((Math.abs(this.x - x) == 1) && (Math.abs(this.y - y) == 2));
@@ -233,21 +241,50 @@ class Horse extends Figure {
 }
 
 class Pawn extends Figure {
-	constructor (x, y, color) {
-		super(x, y, color, color ? 'img/wP.png' : 'img/bP.png');
+	constructor (x, y, color, firstTurn) {
+		super(x, y, color, firstTurn, color ? 'img/wP.png' : 'img/bP.png');
 	}
+
 	defends (x, y) {
 		if (this.x == x) {
-			if (field[this.y + (this.color ? -1 : 1)][x].color != undefined) return false;
-			if (this.firstTurn && field[this.y + (this.color ? -2 : 2)][x].color != undefined) return false;
-			if (this.firstTurn) return this.color ? (this.y - y == 2 || this.y - y == 1) 
-												   : (y - this.y == 2 || y - this.y == 1);
-			else return this.color ? (this.y - y == 1) : (y - this.y == 1);
+			if (field[y][x].color == undefined) {
+				if (this.firstTurn) return this.color ? (this.y - y <= 2) && (this.y - y > 0) : (y - this.y <= 2) && (y - this.y > 0);
+				else return this.color ? (this.y - y == 1) : (y - this.y == 1);
+			}
 		}
 		else if (Math.abs(this.x - x) == 1)
-			if (this.color && (this.y - y == 1) || !this.color && (y - this.y == 1))
-				return (this.color != field[y][x].color) && (field[y][x].color != undefined);
-			else return false;
+			if (this.color && (this.y - y == 1) || !this.color && (y - this.y == 1)) {
+				var copy = turns_arr[turns_arr.length - 1];
+				if (copy != undefined) {
+					if (copy.f == this.constructor) {
+						if ((copy.now.x == x) && (Math.abs(copy.now.y - copy.prev.y) == 2) && 
+							(copy.now.y == this.y) || (this.color && (copy.now.y - this.y == 1)) ||
+							(!this.color && (copy.now.y - this.y == 1)))
+							return true;
+					}
+				}
+				return (field[y][x].color != this.color) && (field[y][x].color != undefined);
+			} else return false;
+	}
+
+	turn (x, y) {
+		var ty = this.y;
+		if (super.turn(x, y)) {
+			var copy = turns_arr[turns_arr.length - 1];
+			if (copy != undefined)
+				if (copy.f == this.constructor)
+					if ((copy.now.x == x) && (Math.abs(copy.now.y - copy.prev.y) == 2) && 
+						((copy.now.y == ty) || (this.color && (copy.now.y - ty == 1)) ||
+												(!this.color && (copy.now.y - ty == 1))))
+						field[copy.now.y][copy.now.x] = new Figure(copy.now.x, copy.now.y);
+			if (this.color && (y == 0) || !this.color && y == 7) {
+				var self = this;
+				Array.prototype.forEach.call( document.querySelectorAll('.chess_menu img'), 
+					a => a.setAttribute('src', `img/${self.color ? 'w' : 'b'}${a.getAttribute('data-f')}.png`) );
+				$('#chess>#chess_overlay').css('display', 'block');
+			}
+			return true;
+		} else return false;
 	}
 }
 
@@ -311,8 +348,7 @@ function checkmate() {
 			else {
 				if (field[arr[0].y][arr[0].x] instanceof Horse) return true;
 				else if (field[arr[0].y][arr[0].x] instanceof Pawn)
-					if (arr[0].x != kp.x) return true;
-					else return false;
+					return arr[0].x != kp.x;
 				else if (kp.x == arr[0].x) {
 					for (var i = arr[0].y - Math.sign(arr[0].y-kp.y); i != kp.y; i -= Math.sign(arr[0].y-kp.y))
 						for (let j = 0; j < 8; j++)
@@ -359,7 +395,7 @@ class Turn {
 window.turn = function(x, y) {
 	if (!figure_chosen) { // если undefined
 		if (field[y][x].color == order_now) {
-			figure_chosen = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);
+			figure_chosen = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 			figure_chosen.show();
 		}
 	}
@@ -377,7 +413,7 @@ window.turn = function(x, y) {
 		}
 		else {
 			figure_chosen.unshow();
-			figure_chosen = new field[y][x].constructor(field[y][x].x, field[y][x].y, field[y][x].color);
+			figure_chosen = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 			figure_chosen.show();
 		}
 	}

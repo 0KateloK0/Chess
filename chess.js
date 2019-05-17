@@ -347,7 +347,10 @@
 									</tr>
 								</table>
 							</div>
-							<div id="chess_buttons"></div>
+							<div id="chess_buttons">
+								<button>Назад</button>
+								<button>Сдаться</button>
+							</div>
 						</div>`);
 
 			var chess_main = $('#chess>#chess_main');

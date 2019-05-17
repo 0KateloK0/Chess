@@ -164,19 +164,19 @@ class Queen extends Figure {
 		if (!((this.x == x) && (this.y == y)))
 			if (this.x == x) {
 				for (var i = this.y - Math.sign(this.y-y); i != y; i -= Math.sign(this.y-y))
-					if (!(field[i][x] instanceof King) && (field[i][x].color != undefined)) return false;
+					if (/*!(field[i][x] instanceof King) && (*/field[i][x].color != undefined) return false;
 				return true;
 			}
 			else if (this.y == y) {
 				for (var i = this.x - Math.sign(this.x-x); i != x; i -= Math.sign(this.x-x))
-					if (!(field[i][x] instanceof King) && (field[y][i].color != undefined)) return false;
+					if (/*!(field[i][x] instanceof King) && (*/field[y][i].color != undefined) return false;
 				return true;
 			}
 			else if (Math.abs(this.y - y) == Math.abs(this.x - x)) {
 				var i = this.y - Math.sign(this.y-y);
 				var j = this.x - Math.sign(this.x-x);
 				while ((i != y) && (j != x)) {
-					if (!(field[i][j] instanceof King) && (field[i][j].color != undefined)) return false;
+					if (/*!(field[i][j] instanceof King) && (*/field[i][j].color != undefined) return false;
 					i -= Math.sign(this.y - y);
 					j -= Math.sign(this.x - x);
 				}
@@ -218,7 +218,7 @@ class Bishop extends Figure {
 				var i = this.y - Math.sign(this.y-y);
 				var j = this.x - Math.sign(this.x-x);
 				while ((i != y) && (j != x)) {
-					if (!(field[i][x] instanceof King) && (field[i][j].color != undefined)) return false;
+					if (/*!(field[i][x] instanceof King) && (*/field[i][j].color != undefined) return false;
 					i -= Math.sign(this.y - y);
 					j -= Math.sign(this.x - x);
 				}
@@ -282,6 +282,7 @@ class Pawn extends Figure {
 				Array.prototype.forEach.call( document.querySelectorAll('.chess_menu img'), 
 					a => a.setAttribute('src', `img/${self.color ? 'w' : 'b'}${a.getAttribute('data-f')}.png`) );
 				$('#chess>#chess_overlay').css('display', 'block');
+
 			}
 			return true;
 		} else return false;
@@ -322,7 +323,7 @@ function init() {
 		field[1][i] = new Pawn(i, 1, false); // черная пешка
 	}
 
-	var chess = $('#chess');
+	var chess = $('#chess_main');
 	for (var i = 0; i < 8; i++) {
 		for (var j = 0; j < 8; j++) {
 			chess.append(`<button onclick="turn(${j}, ${i})" data-color="${
@@ -390,6 +391,20 @@ class Turn {
 		this.prev = prev;
 		this.now = now;
 	}
+}
+
+window.setFigure = function(f) {
+	let figures = new Map([
+		['Q', new Queen()],
+		['R', new Rook()],
+		['N', new Horse()],
+		['B', new Bishop()]
+	]);
+	var copy = turns_arr[turns_arr.length - 1];
+	var fig = figures.get(f);
+	field[copy.now.y][copy.now.x] = new fig.constructor(copy.now.x, copy.now.y,
+					 field[copy.now.y][copy.now.x].color, copy.firstTurn);
+	$('#chess>#chess_overlay').css('display', 'none');
 }
 
 window.turn = function(x, y) {

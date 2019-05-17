@@ -17,6 +17,13 @@
 			display: flex;
 			justify-content: space-around;
 		}
+		.flex {
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: flex;
+		}
 		#chess_main {
 			display: grid;
 			grid-template-rows: repeat(8, 50px);
@@ -90,26 +97,23 @@
 		}
 		.chess_menu>img {
 		}
+
+		#chess_turns_table {
+			width: 100%;
+		}
+		#chess_turns_table td {
+			
+		}
 	</style>
 </head>
-<body onload="init()">
-	<div id="chess">
-		<div id="chess_main">
-			<div id="chess_overlay">
-				<div id="inner-chess_overlay">
-					<button class="chess_menu" onclick="setFigure('Q')"><img alt="" data-f="Q"> Ферзь</button>
-					<button class="chess_menu" onclick="setFigure('R')"><img alt="" data-f="R"> Ладья</button>
-					<button class="chess_menu" onclick="setFigure('B')"><img alt="" data-f="B"> Слон</button>
-					<button class="chess_menu" onclick="setFigure('N')"><img alt="" data-f="N"> Конь</button>
-				</div>
-			</div>
-		</div>
-		<div id="chess_UI">
-			<div id="chess_turns"></div>
-			<div id="chess_buttons"></div>
-		</div>
-	</div>
+<body>
+	<div id="chess"></div>
 	<script type="text/javascript" src="jquery.js"></script>
-	<script type="text/javascript" src="main.js"></script>
+	<script type="text/javascript" src="chess.js"></script>
+	<script type="text/javascript">
+		$('#chess').chess({
+
+		});
+	</script>
 </body>
 </html>

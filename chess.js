@@ -114,6 +114,7 @@
 
 			defends (x, y) {
 				if ((Math.abs(this.x - x) == 2) && (this.y == y)) {
+					// if it's some figures between king and rook it's still can do ракировка
 					if (this.firstTurn && field[y][this.x-x < 0 ? 0 : 7].firstTurn) {
 						for (var c = this.x - Math.sign(this.x-x); c != (this.x-x < 0 ? 7 : 0); c -= Math.sign(this.x - x))
 							for (var i = 0; i < 8; i++) 
@@ -218,6 +219,7 @@
 						var i = this.y - Math.sign(this.y-y);
 						var j = this.x - Math.sign(this.x-x);
 						while ((i != y) && (j != x)) {
+							// it shows move on king
 							if (/*!(field[i][x] instanceof King) && (*/field[i][j].color != undefined) return false;
 							i -= Math.sign(this.y - y);
 							j -= Math.sign(this.x - x);
@@ -248,11 +250,15 @@
 			defends (x, y) {
 				if (this.x == x) {
 					if (field[y][x].color == undefined) {
+						/*if (this.firstTurn && (Math.abs(this.y-y) == 2)) {
+							for (var i = this.y - Math.sign(this.y-y); )
+						}*/
+						//if its some figure before Pawn it still can move
 						if (this.firstTurn) return this.color ? (this.y - y <= 2) && (this.y - y > 0) : (y - this.y <= 2) && (y - this.y > 0);
 						else return this.color ? (this.y - y == 1) : (y - this.y == 1);
 					}
 				}
-				else if (Math.abs(this.x - x) == 1)
+				else if (Math.abs(this.x - x) == 1) // strange bug with killing
 					if (this.color && (this.y - y == 1) || !this.color && (y - this.y == 1)) {
 						var copy = turns_arr[turns_arr.length - 1];
 						if (copy != undefined) {
@@ -348,7 +354,7 @@
 								</table>
 							</div>
 							<div id="chess_buttons">
-								<button>Назад</button>
+								<button>Отменить</button>
 								<button>Сдаться</button>
 							</div>
 						</div>`);

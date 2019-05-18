@@ -11,7 +11,7 @@
 
 		function check() {
 			var kp = find_king();
-			return field.some( (a) => a.some( (b) => (b.color != order_now) && b.check0(kp.x, kp.y) ) );
+			return field.some( (a) => a.some( (b) => !(b instanceof King) && (b.color != order_now) && b.check0(kp.x, kp.y) ) );
 		}
 
 		class Figure {
@@ -50,7 +50,7 @@
 			 */
 			check1 (x, y) {
 				if ( this.defends(x, y) ) {
-					if (field[y][x] instanceof King) return true;
+					if (field[y][x] instanceof King) return true; // sometimes it happening some bad things with king. DON'T DELETE THIS
 					else if (field[y][x].color != this.color) {
 						var copy = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 						var [tx, ty] = [this.x, this.y];
@@ -115,11 +115,13 @@
 			defends (x, y) {
 				if ((Math.abs(this.x - x) == 2) && (this.y == y)) {
 					// if it's some figures between king and rook it's still can do ракировка
-					if (this.firstTurn && field[y][this.x-x < 0 ? 0 : 7].firstTurn) {
-						for (var c = this.x - Math.sign(this.x-x); c != (this.x-x < 0 ? 7 : 0); c -= Math.sign(this.x - x))
+					if (this.firstTurn && field[y][this.x-x < 0 ? 7 : 0].firstTurn) {
+						for (var c = this.x - Math.sign(this.x-x); c != (this.x-x < 0 ? 7 : 0); c -= Math.sign(this.x - x)) {
+							if (field[y][c].color != undefined) return false;
 							for (var i = 0; i < 8; i++) 
 								for (var j = 0; j < 8; j++)
 									if ((field[i][j].color != this.color) && field[i][j].check0(c, y)) return false;
+						}
 						return true;
 					}
 				}
@@ -250,22 +252,21 @@
 			defends (x, y) {
 				if (this.x == x) {
 					if (field[y][x].color == undefined) {
-						/*if (this.firstTurn && (Math.abs(this.y-y) == 2)) {
-							for (var i = this.y - Math.sign(this.y-y); )
-						}*/
-						//if its some figure before Pawn it still can move
+						if (this.firstTurn && (this.color ? (this.y - y <= 2) && (this.y - y > 0) : (y - this.y <= 2) && (y - this.y > 0))) 
+							return field[this.y + (this.color ? -1 : 1)][x].color == undefined;
+						else return this.color ? (this.y - y == 1) : (y - this.y == 1);
 						if (this.firstTurn) return this.color ? (this.y - y <= 2) && (this.y - y > 0) : (y - this.y <= 2) && (y - this.y > 0);
 						else return this.color ? (this.y - y == 1) : (y - this.y == 1);
 					}
 				}
-				else if (Math.abs(this.x - x) == 1) // strange bug with killing
+				else if (Math.abs(this.x - x) == 1)
 					if (this.color && (this.y - y == 1) || !this.color && (y - this.y == 1)) {
 						var copy = turns_arr[turns_arr.length - 1];
 						if (copy != undefined) {
 							if (copy.f == this.constructor) {
-								if ((copy.now.x == x) && (Math.abs(copy.now.y - copy.prev.y) == 2) && 
+								if ((copy.now.x == x) && (Math.abs(copy.now.y - copy.prev.y) == 2) && (
 									(copy.now.y == this.y) || (this.color && (copy.now.y - this.y == 1)) ||
-									(!this.color && (copy.now.y - this.y == 1)))
+									(!this.color && (this.y - copy.now.y == 1))))
 									return true;
 							}
 						}
@@ -281,7 +282,7 @@
 						if (copy.f == this.constructor)
 							if ((copy.now.x == x) && (Math.abs(copy.now.y - copy.prev.y) == 2) && 
 								((copy.now.y == ty) || (this.color && (copy.now.y - ty == 1)) ||
-														(!this.color && (copy.now.y - ty == 1))))
+														(!this.color && (ty - copy.now.y == 1))))
 								field[copy.now.y][copy.now.x] = new Figure(copy.now.x, copy.now.y);
 					if (this.color && (y == 0) || !this.color && y == 7) {
 						var self = this;
@@ -374,7 +375,7 @@
 
 		var figure_chosen = undefined;
 
-		function checkmate() {
+		window.checkmate = function () {
 			var kp = find_king();
 			if (check()) {
 				if ( field[kp.y][kp.x].table.every((a)=>a.every((b)=>!b)) ) {

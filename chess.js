@@ -17,7 +17,7 @@
 		class Figure {
 			constructor (x, y, color, firstTurn=true, src='') {
 				[this.x, this.y, this.color, this.firstTurn, this.src] = [x, y, color, firstTurn, src];
-				$(`#chess_main>button[onclick="turn(${x}, ${y})"]>img`).attr('src', this.src);
+				$(`#inner-chess_main>button[onclick="turn(${x}, ${y})"]>img`).attr('src', this.src);
 			}
 
 			defends (x, y) {
@@ -89,11 +89,11 @@
 				for (var i = 0; i < 8; i++) 
 					for (var j = 0; j < 8; j++) 
 						if ((check() && this.check1(j, i)) || (!check() && this.check0(j, i)))
-							$(`#chess_main>button[onclick="turn(${j}, ${i})"]`).css('background', 'green');
+							$(`#inner-chess_main>button[onclick="turn(${j}, ${i})"]`).css('background', 'green');
 			}
 
 			unshow () {
-				$('#chess_main>button').attr('style', '');
+				$('#inner-chess_main>button').attr('style', '');
 			}
 
 			get table() {
@@ -299,11 +299,23 @@
 		function init() {
 			field = [];
 
+			num_let = new Map([
+				[0, 'a'],
+				[1, 'b'],
+				[2, 'c'],
+				[3, 'd'],
+				[4, 'e'],
+				[5, 'f'],
+				[6, 'g'],
+				[7, 'h']
+			]);
+
 			for (var i = 0; i < 8; i++) {
 				field.push([]);
 				for (var j = 0; j < 8; j++)
 					field[i].push(new Figure(j, i));
 			}
+
 			field[7][4] = new King(4, 7, true); // белый король
 			field[0][4] = new King(4, 0, false); // черный король
 
@@ -332,53 +344,88 @@
 
 			var chess = $('#chess');
 			chess.append(`<div id="chess_main">
-							<div id="chess_overlay">
-								<div id="inner-chess_overlay">
-									<button class="chess_menu" onclick="setFigure('Q')"><img alt="" data-f="Q"> Ферзь</button>
-									<button class="chess_menu" onclick="setFigure('R')"><img alt="" data-f="R"> Ладья</button>
-									<button class="chess_menu" onclick="setFigure('B')"><img alt="" data-f="B"> Слон</button>
-									<button class="chess_menu" onclick="setFigure('N')"><img alt="" data-f="N"> Конь</button>
+							<div id="inner-chess_main">
+								<div id="chess_overlay">
+									<div id="inner-chess_overlay">
+										<button class="chess_menu" onclick="setFigure('Q')"><img alt="" data-f="Q"> Ферзь</button>
+										<button class="chess_menu" onclick="setFigure('R')"><img alt="" data-f="R"> Ладья</button>
+										<button class="chess_menu" onclick="setFigure('B')"><img alt="" data-f="B"> Слон</button>
+										<button class="chess_menu" onclick="setFigure('N')"><img alt="" data-f="N"> Конь</button>
+									</div>
 								</div>
 							</div>
 						</div>
 						<div id="chess_UI">
 							<div id="chess_turns">
-								<table id="chess_turns_table">
-									<tr>
-										<th></th>
-										<th><img src="img/wQ.png" style="height: 25px;"> <span>White</span></th>
-										<th><img src="img/bQ.png" style="height: 25px;"> <span>Black</span></th>
-									</tr>
-									<tr data-turn="1">
-										<td>1</td>
-									</tr>
-								</table>
+								<div></div>
+								<div><img src="img/wK.png" style="height: 30px;"> <span>White</span></div>
+								<div><img src="img/bK.png" style="height: 30px;"> <span>Black</span></div>
+								<div>1</div>
 							</div>
 							<div id="chess_buttons">
-								<button>Отменить</button>
+								<button onclick="undo_turn()">Отменить</button>
 								<button>Сдаться</button>
 							</div>
 						</div>`);
 
-			var chess_main = $('#chess>#chess_main');
+			var chess_main = $('#inner-chess_main');
 
+			$('#chess_main').append('<div></div>');
 			for (var i = 0; i < 8; i++)
+				$('#chess_main').append(`<span>${num_let.get(i)}</span>`);
+			$('#chess_main').append('<div></div>');
+
+			for (var i = 0; i < 8; i++) {
+				$('#chess_main').append(`<span>${8-i}</span>`);
 				for (var j = 0; j < 8; j++)
 					chess_main.append(`<button onclick="turn(${j}, ${i})" data-color="${
 						(i % 2 == j % 2) ? 'white' : 'black'
 					}">
 						<img src="${field[i][j].src}" alt="">
 					</button>`);
+				$('#chess_main').append(`<span>${8-i}</span>`);
+			}
+
+			$('#chess_main').append('<div></div>');
+			for (var i = 0; i < 8; i++)
+				$('#chess_main').append(`<span>${num_let.get(i)}</span>`);
+			$('#chess_main').append('<div></div>');
 
 			turns_arr = [];
+
+			var elem = document.getElementById('chess_turns');
+
+			var prev_scrolled = window.offsetY || elem.scrollTop;
+			elem.onscroll = function() {
+				var scrolled = window.offsetY || elem.scrollTop;
+
+				if (scrolled % 30 != 0) 
+					if (prev_scrolled - scrolled > 0)
+						elem.scrollBy(0, 30 - scrolled % 30);
+					else if (prev_scrolled - scrolled < 0)
+						elem.scrollBy(0, -scrolled % 30);
+				prev_scrolled = window.offsetY || elem.scrollTop;
+			}
 		}
 
 		var figure_chosen = undefined;
 
+		var prev_figure = undefined;
+
+		window.undo_turn= function() {
+			if (turns_arr.length > 0) {
+				var turn = turns_arr[turns_arr.length - 1];
+				field[turn.now.y][turn.now.x].turn0(turn.prev.x, turn.prev.y);
+				field[turn.now.y][turn.now.y] = new prev_figure.constructor(turn.now.x, turn.now.y, prev_figure.color, prev_figure.firstTurn);
+
+				$('#chess_turns');
+			}
+		}
+
 		window.checkmate = function () {
 			var kp = find_king();
 			if (check()) {
-				if ( field[kp.y][kp.x].table.every((a)=>a.every((b)=>!b)) ) {
+				if ( field[kp.y][kp.x].table.every(a=>a.every(b=>!b)) ) {
 					var arr = [];
 					field.map( (a, i) => a.map( (b, j) => {if (b.check0(kp.x, kp.y)) arr.push({x: j, y: i})} ) );
 					if (arr.length == 2) return true;
@@ -426,25 +473,13 @@
 				this.f = f;
 				this.prev = prev;
 				this.now = now;
-
-				let num_let = new Map([
-					[0, 'a'],
-					[1, 'b'],
-					[2, 'c'],
-					[3, 'd'],
-					[4, 'e'],
-					[5, 'f'],
-					[6, 'g'],
-					[7, 'h']
-				]);
+				turns_arr.push(this);
 
 				var text = `${num_let.get(prev.x)}${8-prev.y}-${num_let.get(now.x)}${8-now.y}`;
-
 				var turn_num = Math.floor((turns_arr.length) / 2) + 1;
-				var table = $(`#chess_turns_table tr[data-turn="${turn_num}"]`);
-				table.append(`<td>${text}</td>`);
-				if ((turns_arr.length != 0) && (turns_arr.length % 2 == 1))
-					$('#chess_turns_table').append(`<tr data-turn="${turn_num + 1}"><td>${turn_num+1}</td></tr>`);
+				$('#chess_turns').append(`<div>${text}</div>`);
+				if ((turns_arr.length != 0) && (turns_arr.length % 2 == 0))
+					$('#chess_turns').append(`<div>${turn_num}</div>`);
 			}
 		}
 
@@ -472,12 +507,13 @@
 			else {
 				if ((field[y][x].color == undefined) || (field[y][x].color != order_now)) {
 					var [tx, ty] = [figure_chosen.x, figure_chosen.y];
+					prev_figure = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
 					if (!figure_chosen.turn(x, y))
 						alert('Неправильный ход');
 					else {
+						var turn = new Turn(figure_chosen.constructor, {x: tx, y: ty}, {x: x, y: y});
 						if (checkmate())
 							alert(`${order_now ? 'Белые' : 'Черные'} победили!`);
-						turns_arr.push(new Turn(figure_chosen.constructor, {x: tx, y: ty}, {x: x, y: y}));
 						figure_chosen.unshow();
 						order_now = !order_now;
 						figure_chosen = undefined;

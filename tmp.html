@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		#grid {
+			display: grid;
+			grid-template-columns: 20px 40px 40px;
+			grid-template-rows: 20px;
+			grid-auto-rows: 20px;
+			height: 300px;
+			overflow-y: scroll;
+		}
+	</style>
+</head>
+<body>
+	<div id="grid"></div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript">
+		for (var i = 0; i < 20; i++)
+			$('#grid').append(`<div>${i}</div>`).append(`<div>${i}</div>`).append(`<div>${i}</div>`);
+
+		var elem = document.getElementById('grid');
+		var prev_scrolled = window.offsetY || elem.scrollTop;
+		elem.onscroll = function() {
+			var scrolled = window.offsetY || elem.scrollTop;
+
+			if (scrolled % 20 != 0) 
+				if (prev_scrolled - scrolled > 0)
+					elem.scrollBy(0, 20 - scrolled % 20);
+				else if (prev_scrolled - scrolled < 0)
+					elem.scrollBy(0, -scrolled % 20);
+			prev_scrolled = window.offsetY || elem.scrollTop;
+		}
+	</script>
+</body>
+</html>

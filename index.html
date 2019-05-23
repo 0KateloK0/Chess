@@ -3,127 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<style type="text/css">
-		* {
-			padding: 0;
-			margin: 0;
-			box-sizing: border-box;
-		}
-		body {
-			display: -webkit-flex;
-			display: -moz-flex;
-			display: -ms-flex;
-			display: -o-flex;
-			display: flex;
-			justify-content: space-around;
-		}
-		.flex {
-			display: -webkit-flex;
-			display: -moz-flex;
-			display: -ms-flex;
-			display: -o-flex;
-			display: flex;
-		}
-		#chess_main {
-			display: grid;
-			grid-template-rows: repeat(8, 50px);
-			grid-template-columns: repeat(8, 50px);
-			border: 1px solid black;
-			position: relative;
-		}
-		#chess_main>button {
-			display: block;
-			background: white;
-			border: none;
-			cursor: pointer;
-			outline: none;
-		}
-		#chess_main>button[data-color="black"] {
-			background: grey;
-		}
-		#chess_main>button>img {
-			width: 50px;
-		}
-		#chess {
-			display: grid;
-			grid-template-columns: 1fr 0.5fr;
-			grid-column-gap: 20px;
-		}
-		#chess_overlay {
-			display: none;
-			position: absolute;
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			background: #00000050;
-		}
-		#inner-chess_overlay {
-			width: 75%;
-			height: auto;
-			display: grid;
-			grid-template-columns: 1fr;
-			grid-template-rows: repeat(4, 1fr);
-			transform: translate(-50%, -50%);
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			background: white;
-		}
-		.chess_menu {
-			border: none;
-			background: none;
-			outline: none;
-			display: -webkit-flex;
-			display: -moz-flex;
-			display: -ms-flex;
-			display: -o-flex;
-			display: flex;
-			justify-content: space-between;
-			-ms-align-items: center;
-			align-items: center;
-			padding: 0 10px;
-			font-weight: bold;
-			font-size: 30px;
-			font-family: 'Sans-Serif';
-			border-bottom: 1px solid silver;
-		}
-		.chess_menu:hover {
-			background: #D0D0D0;
-			cursor: pointer;
-		}
-		.chess_menu:active {
-			background: grey;
-		}
-		.chess_menu>img {
-		}
-
-		#chess_turns_table {
-			width: 100%;
-			overflow: scroll;
-			height: 300px
-		}
-		#chess_turns_table td {
-			
-		}
-
-		#chess_buttons{
-
-			display: grid;
-			grid-template-columns: 100%;
-			grid-template-rows: repeat(2, 1fr);
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="chess-styles.css">
 </head>
 <body>
 	<div id="chess"></div>
-	<!-- redo turns without table -->
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="chess.js"></script>
 	<script type="text/javascript">
-		$('#chess').chess({
-
-		});
+		$('#chess').chess({});
 	</script>
 </body>
 </html>

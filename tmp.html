@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+<<<<<<< HEAD
+	<style type="text/css">
+		#grid {
+			display: grid;
+			grid-template-columns: 20px 40px 40px;
+			grid-template-rows: 20px;
+			grid-auto-rows: 20px;
+			height: 300px;
+			overflow-y: scroll;
+		}
+	</style>
+</head>
+<body>
+	<div id="grid"></div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript">
+		for (var i = 0; i < 20; i++)
+			$('#grid').append(`<div>${i}</div>`).append(`<div>${i}</div>`).append(`<div>${i}</div>`);
+
+		var elem = document.getElementById('grid');
+		var prev_scrolled = window.offsetY || elem.scrollTop;
+		elem.onscroll = function() {
+			var scrolled = window.offsetY || elem.scrollTop;
+
+			if (scrolled % 20 != 0) 
+				if (prev_scrolled - scrolled > 0)
+					elem.scrollBy(0, 20 - scrolled % 20);
+				else if (prev_scrolled - scrolled < 0)
+					elem.scrollBy(0, -scrolled % 20);
+			prev_scrolled = window.offsetY || elem.scrollTop;
+		}
+	</script>
+</body>
+</html>
+=======
+	<link href="https://fonts.googleapis.com/css?family=Indie+Flower|Open+Sans&display=swap" rel="stylesheet">
+	<style type="text/css">
+		#chess *{
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+			font-family: 'Open Sans';
+		}
+		#chess {
+			display: grid;
+			grid-template-columns: 500px 250px;
+			grid-column-gap: 20px;
+			grid-template-rows: 300px 200px;
+			grid-template-areas: "chess_main chess_UI_turns"
+								 "chess_main chess_UI_buttons";
+			position: relative;
+			width: min-content;
+		}
+
+		#chess_menu_overlay {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			right: 0;
+			left: 0;
+			background: #00000090;
+			color: #FFA800;
+			padding: 40px;
+			z-index: 1;
+			text-align: center;
+		}
+		#chess_menu_overlay>h1 {
+			font-family: 'Indie Flower' !important;
+			font-size: 100px;
+		}
+		.chess_menu_btn {
+			width: 40%;
+			padding: 10px 0 10px !important;
+			background: #FFA800;
+			font-size: 30px;
+			cursor: pointer;
+		}
+
+		#chess_main {
+			display: grid;
+			grid-template-columns: repeat(10, 50px);
+			grid-template-rows: repeat(10, 50px);
+			grid-area: chess_main;
+		}
+		.chess_main_smb {
+			
+		}
+		.chess_main_btn {
+			
+		}
+		.chess_main_btn_img {
+			width: 50px;
+		}
+
+		#chess_UI_turns {
+			grid-area: chess_UI_turns;
+			display: grid;
+			grid-template-rows: 30px 30px;
+			grid-auto-rows: 30px;
+			grid-template-areas: ". header-wh header-bl";
+			text-transform: uppercase;
+		}
+		.chess_UI_turns-header {
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: flex;
+			justify-content: space-around;
+			-ms-align-items: center;
+			align-items: center;
+			font-family: "Sans-serif";
+			font-size: 20px;
+		}
+		.chess_UI_turns-header > img {
+			height: 30px;
+		}
+		#chess_UI_buttons {
+			padding-top: 20px;
+			grid-area: chess_UI_buttons;
+		}
+		#inner-chess_UI_buttons {
+			width: 100%;
+			height: 100%;
+			display: grid;
+			grid-template-rows: repeat(2, 1fr);
+			grid-row-gap: 20px;
+			padding: 20px;
+		}
+
+		#chess_overlay {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			display: none;
+			text-align: center;
+			background: #00000090;
+		}
+		#inner-chess_overlay {
+			display: grid;
+			grid-template-rows: repeat(4, 75px);
+			width: 50%;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		.chess_overlay_btn {
+			background: white;
+			display: -webkit-flex;
+			display: -moz-flex;
+			display: -ms-flex;
+			display: -o-flex;
+			display: flex;
+			justify-content: space-between;
+			border: 1px solid silver;
+			font-size: 30px;
+			padding: 0px 40px !important;
+			outline: none;
+			cursor: pointer;
+		}
+		.chess_overlay_btn:hover {
+			background: grey;
+			color: white;
+		}
+		.chess_overlay_btn:active {
+			background: #222;
+			color: white;
+		}
+	</style>
+</head>
+<body onload="init()">
+	<div id="chess"></div>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript">
+		function init() {
+			/*field = [];
+
+			for (var i = 0; i < 8; i++) {
+				field.push([]);
+				for (var j = 0; j < 8; j++)
+					field[i].push(new Figure(j, i));
+			}
+
+			field[7][4] = new King(4, 7, true); // белый король
+			field[0][4] = new King(4, 0, false); // черный король
+
+			field[7][3] = new Queen(3, 7, true); // белый ферзь
+			field[0][3] = new Queen(3, 0, false); // черный ферзь
+
+			field[7][7] = new Rook(7, 7, true); // белая ладья_1
+			field[7][0] = new Rook(0, 7, true); // белая ладья_2
+			field[0][7] = new Rook(7, 0, false); // черная ладья_1
+			field[0][0] = new Rook(0, 0, false); // черная ладья_2
+
+			field[7][2] = new Bishop(2, 7, true); // белый слон_1
+			field[7][5] = new Bishop(5, 7, true); // белый слон_2
+			field[0][2] = new Bishop(2, 0, false); // черный слон_1
+			field[0][5] = new Bishop(5, 0, false); // черный слон_2
+
+			field[7][1] = new Horse(1, 7, true); // белый конь_1
+			field[7][6] = new Horse(6, 7, true); // белый конь_2
+			field[0][1] = new Horse(1, 0, false); // черный конь_1
+			field[0][6] = new Horse(6, 0, false); // черный конь_2
+
+			for (var i = 0; i < 8; i++) {
+				field[6][i] = new Pawn(i, 6, true); // белая пешка
+				field[1][i] = new Pawn(i, 1, false); // черная пешка
+			}*/
+
+			var chess = $('#chess');
+
+			chess.append(`<div id="chess_menu_overlay">
+							<h1>Chess</h1>
+							<button class="chess_menu_btn">Play</button>
+						</div>
+						<div id="chess_main">
+							
+						</div>
+						<div id="chess_UI_turns">
+							<div class="chess_UI_turns-header" style="grid-area: header-wh"><img src="img/wK.png"><span>white</span></div>
+							<div class="chess_UI_turns-header" style="grid-area: header-bl"><img src="img/bK.png"><span>black</span></div>
+						</div>
+						<div id="chess_UI_buttons">
+							<div id="inner-chess_UI_buttons">
+								<button>Undo</button>
+								<button>Surrender</button>
+							</div>
+						</div>
+						<div id="chess_overlay">
+							<div id="inner-chess_overlay">
+								<button data-f="Q" class="chess_overlay_btn"><img src="">Queen</button>
+								<button data-f="R" class="chess_overlay_btn"><img src="">Rook</button>
+								<button data-f="B" class="chess_overlay_btn"><img src="">Bishop</button>
+								<button data-f="N" class="chess_overlay_btn"><img src="">Horse</button>
+							</div>
+						</div>`);
+
+			chess.find('#chess_main').append('<div></div>');
+			let bukvi = new Map([[0, 'a'], [1, 'b'], [2, 'c'], [3, 'd'], [4, 'e'], [5, 'f'], [6, 'g'], [7, 'h']]);
+			for (var i = 0; i < 8; i++)
+				chess.find('#chess_main').append(`<div>${bukvi.get(i)}</div>`);
+			chess.find('#chess_main').append('<div></div>');
+
+			//for (var i = )
+			forEach = Array.prototype.forEach;
+			
+			forEach.call($('#inner-chess_overlay>button'), a => a.onclick = function(e) {
+				let figures = new Map([
+					['Q', new Queen()],
+					['R', new Rook()],
+					['N', new Horse()],
+					['B', new Bishop()]
+				]);
+				var copy = turns_arr[turns_arr.length - 1];
+				var fig = figures.get(e.currentTarget.getAttribute('data-f'));
+				field[copy.now.y][copy.now.x] = new fig.constructor(copy.now.x, copy.now.y,
+								 field[copy.now.y][copy.now.x].color, copy.firstTurn);
+				$('#chess #chess_overlay').css('display', 'none');
+			});
+
+			var order_now = true,
+				figure_chosen = undefined,
+				turns_arr = [];
+
+			forEach.call($('#chess_main>button'), a => a.onclick = function(e) {
+				var x = e.currentTarget.getAttribute('data-x'),
+					y = e.currentTarget.getAttribute('data-y');
+				if (!figure_chosen) { // если undefined
+					if (field[y][x].color == order_now) {
+						figure_chosen = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
+						figure_chosen.show();
+					}
+				}
+				else {
+					if ((field[y][x].color == undefined) || (field[y][x].color != order_now)) {
+						var [tx, ty] = [figure_chosen.x, figure_chosen.y];
+						if (!figure_chosen.turn(x, y))
+							alert('Неправильный ход');
+						else {
+							if (checkmate())
+								alert(`${order_now ? 'Белые' : 'Черные'} победили!`);
+							turns_arr.push(new Turn(figure_chosen.constructor, {x: tx, y: ty}, {x: x, y: y}));
+							figure_chosen.unshow();
+							order_now = !order_now;
+							figure_chosen = undefined;
+						}
+					}
+					else {
+						figure_chosen.unshow();
+						figure_chosen = new field[y][x].constructor(x, y, field[y][x].color, field[y][x].firstTurn);
+						figure_chosen.show();
+					}
+				}
+			})
+		}
+	</script>
+</body>
+</html>
+>>>>>>> parent of 49026c9... Revert "Revert "Revert "UI"""

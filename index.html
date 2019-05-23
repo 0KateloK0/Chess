@@ -26,36 +26,28 @@
 		}
 		#chess_main {
 			display: grid;
-			grid-template-rows: repeat(10, 50px);
-			grid-template-columns: repeat(10, 50px);
+			grid-template-rows: repeat(8, 50px);
+			grid-template-columns: repeat(8, 50px);
+			border: 1px solid black;
 			position: relative;
 		}
-		#inner-chess_main {
-			grid-column: 2 / 10;
-			grid-row: 2 / 10;
-			display: grid;
-			grid-template-columns: repeat(8, 49.75px);
-			grid-template-rows: repeat(8, 49.75px);
-			border: 1px solid black;
-		}
-		#inner-chess_main>button {
+		#chess_main>button {
 			display: block;
 			background: white;
 			border: none;
 			cursor: pointer;
 			outline: none;
 		}
-		#inner-chess_main>button[data-color="black"] {
+		#chess_main>button[data-color="black"] {
 			background: grey;
 		}
-		#inner-chess_main>button>img {
+		#chess_main>button>img {
 			width: 50px;
 		}
 		#chess {
 			display: grid;
 			grid-template-columns: 1fr 0.5fr;
 			grid-column-gap: 20px;
-			/* width: 600px; */
 		}
 		#chess_overlay {
 			display: none;
@@ -106,16 +98,17 @@
 		.chess_menu>img {
 		}
 
-		#chess_turns {
-			display: grid;
-			grid-template-columns: 1fr 2fr 2fr;
-			grid-template-rows: 30px;
-			grid-auto-rows: 30px;
-			height: 300px;
-			overflow-y: scroll;
+		#chess_turns_table {
+			width: 100%;
+			overflow: scroll;
+			height: 300px
+		}
+		#chess_turns_table td {
+			
 		}
 
 		#chess_buttons{
+
 			display: grid;
 			grid-template-columns: 100%;
 			grid-template-rows: repeat(2, 1fr);
@@ -124,6 +117,7 @@
 </head>
 <body>
 	<div id="chess"></div>
+	<!-- redo turns without table -->
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="chess.js"></script>
 	<script type="text/javascript">

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<style type="text/css">
+	<!-- <style type="text/css">
 		* {
 			padding: 0;
 			margin: 0;
@@ -105,6 +105,7 @@
 		}
 		.chess_menu>img {
 		}
+<<<<<<< HEAD
 
 		#chess_turns {
 			display: grid;
@@ -113,23 +114,36 @@
 			grid-auto-rows: 30px;
 			height: 300px;
 			overflow-y: scroll;
+=======
+	
+		#chess_turns_table {
+			width: 100%;
+			overflow: scroll;
+			height: 300px
 		}
-
+		#chess_turns_table td {
+			
+>>>>>>> parent of 49026c9... Revert "Revert "Revert "UI"""
+		}
+	
 		#chess_buttons{
+<<<<<<< HEAD
+=======
+	
+>>>>>>> parent of 49026c9... Revert "Revert "Revert "UI"""
 			display: grid;
 			grid-template-columns: 100%;
 			grid-template-rows: repeat(2, 1fr);
 		}
-	</style>
+	</style> -->
+	<link rel="stylesheet" type="text/css" href="chess-styles.css">
 </head>
 <body>
 	<div id="chess"></div>
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="chess.js"></script>
 	<script type="text/javascript">
-		$('#chess').chess({
-
-		});
+		$('#chess').chess({});
 	</script>
 </body>
 </html>

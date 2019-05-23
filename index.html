@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<style type="text/css">
+	<!-- <style type="text/css">
 		* {
 			padding: 0;
 			margin: 0;
@@ -97,7 +97,7 @@
 		}
 		.chess_menu>img {
 		}
-
+	
 		#chess_turns_table {
 			width: 100%;
 			overflow: scroll;
@@ -106,24 +106,22 @@
 		#chess_turns_table td {
 			
 		}
-
+	
 		#chess_buttons{
-
+	
 			display: grid;
 			grid-template-columns: 100%;
 			grid-template-rows: repeat(2, 1fr);
 		}
-	</style>
+	</style> -->
+	<link rel="stylesheet" type="text/css" href="chess-styles.css">
 </head>
 <body>
 	<div id="chess"></div>
-	<!-- redo turns without table -->
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="chess.js"></script>
 	<script type="text/javascript">
-		$('#chess').chess({
-
-		});
+		$('#chess').chess({});
 	</script>
 </body>
 </html>
